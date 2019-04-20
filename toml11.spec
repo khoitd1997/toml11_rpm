@@ -39,8 +39,8 @@ cp -ar toml/ LICENSE README.md toml.hpp %{buildroot}/%{_includedir}/%{name}
 make
 # make test
 
-%files devel
-%defattr(-, root, root)
+%files
+%defattr(-,root,root,-)
 %doc README.md
 %license LICENSE
 %{_includedir}/%{name}/

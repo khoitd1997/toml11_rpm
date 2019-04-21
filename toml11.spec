@@ -1,32 +1,44 @@
-%global user	ToruNiina
+%global user            ToruNiina
+%global toml_ver        0.5.0
+%global debug_package   %{nil}
 
-name:			toml11
-Summary:		Toml parser/encoder C++11 headers library
-License:		MIT
-Group:			Development/Languages/C and C++
-Release:		1%{?dist}
-Version:		2.2.2
-Requires:		gcc-c++
-BuildRequires:	cmake make gcc-c++ boost-devel
-ExclusiveArch:	x86_64
-Url:			https://github.com/%{user}/%{name}/
-Source0:		https://github.com/%{user}/%{name}/archive/v%{version}.tar.gz
+Name:               toml11
+Summary:            Toml parser/encoder C++11 headers library
+License:            MIT
+Group:              Development/Languages/C and C++
+Release:            1%{?dist}
+Version:            2.2.2
 
-%package devel
-Summary:		Toml parser/encoder C++11 headers library
-Group:			Development/Languages/C and C++
-Provides:		%{name}-static = %{version}-%{release}
+BuildRequires:      cmake
+BuildRequires:      make
+BuildRequires:      gcc-c++
+BuildRequires:      boost-devel
+
+ExclusiveArch:      x86_64 ARM-hfp AArch64
+Url:                https://github.com/%{user}/%{name}/
+Source0:            https://github.com/%{user}/%{name}/archive/v%{version}.tar.gz
+Source1:            https://github.com/toml-lang/toml/archive/v%{toml_ver}.tar.gz
 
 %description
-Toml11 is a C++11 header-only toml parser/encoder
+Toml11 is a C++11 header-only toml parser/encoder. Compliant with %{toml_ver}
+
+%package devel
+Summary:            Toml parser/encoder C++11 headers library
+Group:              Development/Languages/C and C++
+Provides:           %{name}-static = %{version}-%{release}
+Provides:           %{name} = %{version}-%{release}
+Requires:           libstdc++-devel
 
 %description devel
-Toml11 is a C++11 header-only toml parser/encoder
-
-%global debug_package %{nil}
+Toml11 is a C++11 header-only toml parser/encoder. Compliant with %{toml_ver}
 
 %prep
-%autosetup
+%setup -q
+%setup -q -T -D -a 1
+mkdir build
+cd build
+gzip -dc %{SOURCE1} | tar -xvvf -
+mv toml-%{toml_ver} toml
 
 %build
 
@@ -35,15 +47,15 @@ mkdir -p %{buildroot}/%{_includedir}/%{name}
 cp -ar toml/ LICENSE README.md toml.hpp %{buildroot}/%{_includedir}/%{name}
 
 %check
-%cmake
+cd build
+cmake ..
 make
-# make test
+make test
 
-%files
+%files devel
 %defattr(-,root,root,-)
 %doc README.md
 %license LICENSE
-%{_includedir}/%{name}/
+%{_includedir}/%{name}
 
 %changelog
-
